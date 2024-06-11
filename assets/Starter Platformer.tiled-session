@@ -1,0 +1,44 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "platformer-level-1.tmj": {
+            "scale": 1.5054861111111109,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 284.62567461598786,
+                "y": 178.6798284053693
+            }
+        },
+        "platformer-level-1.tmj#kenny_tilemap_packed": {
+            "scaleInDock": 1
+        },
+        "platformer-level-1.tmx#kenny_tilemap_packed": {
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Users/alw/Desktop/CMPM 120/StarterPlatformer/assets",
+    "map.lastUsedFormat": "json",
+    "map.tileHeight": 18,
+    "map.tileWidth": 18,
+    "map.width": 40,
+    "openFiles": [
+    ],
+    "project": "Starter Platformer.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "platformer-level-1.tmj"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 18,
+        "width": 18
+    }
+}

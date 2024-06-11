@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Quest</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #phaser-game {
+            width: 1440px; 
+            height: 720px; 
+            border: 1px solid #fff;
+        }
+        #Stats-panel {
+            width: 210px;
+            height: 100px;
+            background-color: #333;
+            margin-top: -624px;
+            padding: 10px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+        }
+        #control-panel {
+            width: 210px;
+            height: 300px;
+            background-color: #333;
+            margin-top: -200px;
+            margin-left: -210px;
+            padding: 10px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+        }
+        
+        h2, p {
+            margin: 0 0 10px 0;
+        }
+    </style>
+    <script src="./lib/phaser.js"></script>
+    <script src="./src/Scenes/Load.js"></script>
+    <script src="./src/Scenes/StartingMenu.js"></script>
+    <script src="./src/Scenes/Platformer.js"></script>
+    <script src="./src/Scenes/WinMenu.js"></script>
+    <script src="./src/Scenes/OverMenu.js"></script>
+    <script src="./src/main.js"></script>
+</head>
+<body>
+    <div id="phaser-game"></div>
+    <div id="Stats-panel">
+        <h2>Game Stats</h2>
+        <p id="lives">Lives: 3</p>
+        <p id="keys">Keys: 0</p>
+    </div>
+    <div id="control-panel">
+        <h2>How To Play</h2>
+        <p>Collect 3 keys to open the gate</p>
+        <h2>Game Controls</h2>
+        <p>← - Move Left</p>
+        <p>→ - Move Right</p>
+        <p>↑ - Jump</p>
+        <p>↓ - Crouch</p>
+        <p>D - Debug Mod</p>
+        <p>R - Reset</p>
+    </div>
+    <span id="description"></span>
+</body>
+</html>
