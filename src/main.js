@@ -30,8 +30,8 @@ let config = {
             }
         }
     },
-    width: 1440,
-    height: 720,
+    width: 720,
+    height: 1440,
     scene: [Load, SceneMainMenu, Platformer, SceneWin, SceneGameOver]
 }
 

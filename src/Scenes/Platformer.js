@@ -8,7 +8,6 @@ class Platformer extends Phaser.Scene {
         this.load.audio('coinSound', 'Coinsound.wav');  
         this.load.audio('jumpSound', 'jumpsound.mp3');  
         this.load.audio('keySound', 'Keysound.wav');  
-
     }
 
     init() {
@@ -24,7 +23,7 @@ class Platformer extends Phaser.Scene {
     }
 
     create() {
-        this.map = this.add.tilemap("platformer-level-1", 18, 18, 45, 25);
+        this.map = this.add.tilemap("platformer-level-1");
         this.tileset = this.map.addTilesetImage("kenny_tilemap_packed", "tilemap_tiles");
         this.tilesetBg = this.map.addTilesetImage("tilemap-backgrounds", "tilemap-backgrounds");
 
@@ -61,11 +60,10 @@ class Platformer extends Phaser.Scene {
         this.physics.world.enable(this.keys, Phaser.Physics.Arcade.STATIC_BODY);
         this.physics.world.enable(this.flag, Phaser.Physics.Arcade.STATIC_BODY);
 
-
         this.coinGroup = this.add.group(this.coins);
         this.keyGroup = this.add.group(this.keys);
 
-        my.sprite.player = this.physics.add.sprite(90, 100, "platformer_characters", "tile_0000.png");
+        my.sprite.player = this.physics.add.sprite(100, 1700, "platformer_characters", "tile_0000.png");
         my.sprite.player.setCollideWorldBounds(true);
 
         this.physics.add.collider(my.sprite.player, this.groundLayer);
@@ -81,9 +79,8 @@ class Platformer extends Phaser.Scene {
             this.updateStats();
         });
 
-        this.physics.add.collider(my.sprite.player, this.groundLayer);
         this.physics.add.overlap(my.sprite.player, this.flag, (obj1, obj2) => {
-        this.scene.start("SceneWin");
+            this.scene.start("SceneWin");
         });
 
         this.physics.add.collider(my.sprite.player, this.killableLayer, () => {
@@ -102,7 +99,6 @@ class Platformer extends Phaser.Scene {
             }
         });
 
-
         cursors = this.input.keyboard.createCursorKeys();
         this.rKey = this.input.keyboard.addKey('R');
 
@@ -120,12 +116,15 @@ class Platformer extends Phaser.Scene {
             frequency: 100 
         });
         my.vfx.walking.stop();
-        
 
+        // Adjust camera bounds to match map dimensions
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.startFollow(my.sprite.player, true, 0.25, 0.25);
         this.cameras.main.setDeadzone(50, 50);
         this.cameras.main.setZoom(this.SCALE);
+
+        // Adjust physics world bounds to match map dimensions
+        this.physics.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
         this.movingPlatforms = [];
         const platformProperties = [
@@ -139,7 +138,7 @@ class Platformer extends Phaser.Scene {
             const platform1 = this.add.image(9, 9, "sprite_tiles", "48").setScale(1);
             const platform2 = this.add.image(27, 9, "sprite_tiles", "49").setScale(1);
             const platform3 = this.add.image(45, 9, "sprite_tiles", "50").setScale(1);
-            
+
             container.add([platform1, platform2, platform3]);
             this.physics.world.enable(container);
             container.body.setImmovable(true);

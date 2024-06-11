@@ -1,5 +1,3 @@
-// StartingMenu.js
-
 class SceneMainMenu extends Phaser.Scene {
     constructor() {
         super({ key: "SceneMainMenu" });
@@ -23,17 +21,17 @@ class SceneMainMenu extends Phaser.Scene {
     create() {
         this.bg = this.add.image(this.game.config.width / 2, this.game.config.height / 2, 'sprBg0')
             .setOrigin(0.5)
-            .setDepth(1)
-            .setScale(0.8); 
+            .setDepth(0)
+            .setScale(0.8);
+
         this.sfx = {
             btnOver: this.sound.add("sndBtnOver", { volume: 0.1 }),
             btnDown: this.sound.add("sndBtnDown", { volume: 0.1 })
         };
 
-
         this.btnPlay = this.add.sprite(
-            this.game.config.width * 0.517,
-            this.game.config.height * 0.3,
+            this.game.config.width / 2,
+            this.game.config.height / 2,
             "sprBtnPlay"
         ).setInteractive();
 
