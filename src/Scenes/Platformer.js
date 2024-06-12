@@ -19,7 +19,7 @@ class Platformer extends Phaser.Scene {
 
     init() {
         this.ACCELERATION = 200;
-        this.DRAG = 1000;
+        this.DRAG = 2000;
         this.physics.world.gravity.y = 1500;
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 2.0;
@@ -245,9 +245,6 @@ class Platformer extends Phaser.Scene {
                 my.sprite.player.setVelocityX(0);
             } else if (!this.isCrouching) {
                 if (cursors.left.isDown) {
-                    if (my.sprite.player.body.velocity.x > 0) {
-                        my.sprite.player.setVelocityX(0); // Stop horizontal movement instantly when changing direction
-                    }
                     my.sprite.player.setAccelerationX(-speed);
                     my.sprite.player.setDragX(this.DRAG); // Apply drag to slow down the character when stopping
                     my.sprite.player.resetFlip();
@@ -256,9 +253,6 @@ class Platformer extends Phaser.Scene {
                     my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
                     my.vfx.walking.start();
                 } else if (cursors.right.isDown) {
-                    if (my.sprite.player.body.velocity.x < 0) {
-                        my.sprite.player.setVelocityX(0); // Stop horizontal movement instantly when changing direction
-                    }
                     my.sprite.player.setAccelerationX(speed);
                     my.sprite.player.setDragX(this.DRAG); // Apply drag to slow down the character when stopping
                     my.sprite.player.setFlipX(true); 
@@ -302,10 +296,24 @@ class Platformer extends Phaser.Scene {
     updateJumpProgressBar(progress) {
         // Clear the previous progress bar
         this.jumpProgressBar.clear();
-    
+
         // Setting the color and position of the progress bar
         this.jumpProgressBar.fillStyle(0x00ff00, 1);  // green
         this.jumpProgressBar.fillRect(my.sprite.player.x - 25, my.sprite.player.y - 40, 50 * progress, 5);  // Progress bar position and size
+    }
+
+    savePosition() {
+        this.savedPosition = { x: my.sprite.player.x, y: my.sprite.player.y };
+        console.log("Position saved:", this.savedPosition);
+    }
+
+    loadPosition() {
+        if (this.savedPosition) {
+            my.sprite.player.setPosition(this.savedPosition.x, this.savedPosition.y);
+            console.log("Position loaded:", this.savedPosition);
+        } else {
+            console.log("No saved position to load.");
+        }
     }
 
     loseLife() {
@@ -317,12 +325,11 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.setPosition(90, 100);
         }
     }
-    
+
     updateStats() {
         this.livesText.setText(`Lives: ${this.LIVES}`);
         this.keysText.setText(`Keys: ${this.keyCount}`);
         this.livesElement.textContent = `Lives: ${this.LIVES}`;
         this.keysElement.textContent = `Keys: ${this.keyCount}`;
     }
-    }
-    
+}
