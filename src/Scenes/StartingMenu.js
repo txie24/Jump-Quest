@@ -21,7 +21,7 @@ class SceneMainMenu extends Phaser.Scene {
     create() {
         this.bg = this.add.image(this.game.config.width / 2, this.game.config.height / 2, 'sprBg0')
             .setOrigin(0.5)
-            .setDepth(0)
+            .setDepth(1)
             .setScale(0.8);
 
         this.sfx = {
@@ -31,9 +31,10 @@ class SceneMainMenu extends Phaser.Scene {
 
         this.btnPlay = this.add.sprite(
             this.game.config.width / 2,
-            this.game.config.height / 2,
+            this.game.config.height / 1.78,
             "sprBtnPlay"
         ).setInteractive();
+        this.btnPlay.setScale(2);
 
         this.btnPlay.on("pointerover", () => {
             this.btnPlay.setTexture("sprBtnPlayHover");
