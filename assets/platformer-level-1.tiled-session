@@ -155,6 +155,7 @@
         "C:/Users/alw/Desktop/CMPM 120/Plat/assets/3adesign1.tmx",
         "C:/Users/alw/Desktop/CMPM 120/Plat/assets/3adesign1 copy.tmx"
     ],
+    "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
     "tileset.margin": 0,
     "tileset.spacing": 0,
