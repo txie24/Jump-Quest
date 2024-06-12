@@ -18,7 +18,7 @@ class Platformer extends Phaser.Scene {
     }
 
     init() {
-        this.ACCELERATION = 201;
+        this.ACCELERATION = 200;
         this.DRAG = 1000;
         this.physics.world.gravity.y = 1500;
         this.PARTICLE_VELOCITY = 50;
@@ -34,9 +34,9 @@ class Platformer extends Phaser.Scene {
         this.tilesetBg = this.map.addTilesetImage("tilemap-backgrounds", "tilemap-backgrounds");
 
         this.backGroundLayer = this.map.createLayer("BG", this.tilesetBg, 0, 0);
+        this.overlayLayer = this.map.createLayer("Overlays", this.tileset, 0, 0);
         this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset, 0, 0);
         this.killableLayer = this.map.createLayer("Killables", this.tileset, 0, 0);
-        this.overlayLayer = this.map.createLayer("Overlays", this.tileset, 0, 0);
         this.waterLayer = this.map.createLayer("Water", this.tileset, 0, 0);
         this.Gate = this.map.createLayer("Gate", this.tileset, 0, 0);
 
