@@ -5,7 +5,7 @@ class Platformer extends Phaser.Scene {
         this.isCrouching = false;
         this.MIN_JUMP_VELOCITY = 200; // minimum jumping force
         this.MAX_JUMP_VELOCITY = 700; // Maximum jumping force
-        this.MAX_CROUCH_TIME = 1000;  // Maximum buildup time (milliseconds)
+        this.MAX_CROUCH_TIME = 1000;  // Maximum power-up Time (milliseconds)
     }
 
     preload() {
@@ -169,6 +169,10 @@ class Platformer extends Phaser.Scene {
 
         this.livesElement = document.getElementById('lives');
         this.keysElement = document.getElementById('keys');
+
+        // Creating a power-up progress bar
+        this.jumpProgressBar = this.add.graphics();
+        this.jumpProgressBar.setDepth(20);  // Set the depth higher than the other elements to make sure it's in front of the
     }
 
     update() {
@@ -183,10 +187,17 @@ class Platformer extends Phaser.Scene {
                 this.crouchStartTime = this.time.now;
                 this.isCrouching = true;
             }
+
+            // Updated power-up progress bar
+            let crouchDuration = this.time.now - this.crouchStartTime;
+            crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
+            let progress = crouchDuration / this.MAX_CROUCH_TIME;
+
+            this.updateJumpProgressBar(progress);
         } else if (this.spaceKey.isUp && this.isCrouching) {
             my.sprite.player.setScale(1);
 
-            // Calculation of bulidup time
+            // Calculation of power-up time
             let crouchDuration = this.time.now - this.crouchStartTime;
             crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
 
@@ -206,9 +217,15 @@ class Platformer extends Phaser.Scene {
 
             // Reset power state
             this.isCrouching = false;
+
+            // Hide the progress bar
+            this.updateJumpProgressBar(0);
         } else if (this.spaceKey.isUp) {
             my.sprite.player.setScale(1);
             this.isCrouching = false;
+
+            // Hide the progress bar
+            this.updateJumpProgressBar(0);
         }
 
         if (cursors.left.isDown && my.sprite.player.body.blocked.down) {
@@ -256,6 +273,15 @@ class Platformer extends Phaser.Scene {
                 platform.container.body.setVelocityX(40);
             }
         });
+    }
+
+    updateJumpProgressBar(progress) {
+        // Clear the previous progress bar
+        this.jumpProgressBar.clear();
+
+        // Setting the color and position of the progress bar
+        this.jumpProgressBar.fillStyle(0x00ff00, 1);  // green
+        this.jumpProgressBar.fillRect(my.sprite.player.x - 25, my.sprite.player.y - 40, 50 * progress, 5);  // 进度条的位置和大小
     }
 
     loseLife() {
