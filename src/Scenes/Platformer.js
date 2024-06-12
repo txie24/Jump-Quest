@@ -28,7 +28,7 @@ class Platformer extends Phaser.Scene {
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 2.0;
         this.LIVES = 3;
-        this.keyCount = 0;
+        this.keyCount = 3;
         this.CROUCH_SPEED = 50;  
         this.isPlayerFacingRight = true;
     }

@@ -32,8 +32,8 @@ class Load extends Phaser.Scene {
         key: 'walk',
         frames: this.anims.generateFrameNames('platformer_characters', {
           prefix: "tile_",
-          start: 0,
-          end: 1,
+          start: 6,
+          end: 7,
           suffix: ".png",
           zeroPad: 4
         }),
@@ -45,7 +45,7 @@ class Load extends Phaser.Scene {
         key: 'idle',
         defaultTextureKey: "platformer_characters",
         frames: [
-          { frame: "tile_0000.png" }
+          { frame: "tile_0006.png" }
         ],
         repeat: -1
       });
@@ -54,7 +54,7 @@ class Load extends Phaser.Scene {
         key: 'jump',
         defaultTextureKey: "platformer_characters",
         frames: [
-          { frame: "tile_0001.png" }
+          { frame: "tile_0007.png" }
         ],
       });
   
