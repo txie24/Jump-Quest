@@ -3,9 +3,9 @@ class Platformer extends Phaser.Scene {
         super("platformerScene");
         this.crouchStartTime = 0;
         this.isCrouching = false;
-        this.MIN_JUMP_VELOCITY = 200; // min jump
-        this.MAX_JUMP_VELOCITY = 700; // max jump
-        this.MAX_CROUCH_TIME = 1000;  // max build up
+        this.MIN_JUMP_VELOCITY = 200; // minimum jumping force
+        this.MAX_JUMP_VELOCITY = 700; // maxmum jumping force
+        this.MAX_CROUCH_TIME = 1000;  // Maximum buildup time (milliseconds)
     }
 
     preload() {
@@ -177,7 +177,7 @@ class Platformer extends Phaser.Scene {
             speed = this.CROUCH_SPEED;
             my.sprite.player.setScale(1, 0.7);
 
-            // count
+            // start counting
             if (!this.isCrouching) {
                 this.crouchStartTime = this.time.now;
                 this.isCrouching = true;
@@ -185,16 +185,23 @@ class Platformer extends Phaser.Scene {
         } else if (cursors.down.isUp && this.isCrouching) {
             my.sprite.player.setScale(1);
 
-            // Calculate buildup time
+            // Calculation of storage time
             let crouchDuration = this.time.now - this.crouchStartTime;
             crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
 
             // Calculating jump force
             let jumpForce = Phaser.Math.Linear(this.MIN_JUMP_VELOCITY, this.MAX_JUMP_VELOCITY, crouchDuration / this.MAX_CROUCH_TIME);
 
-            // jump
+            // Jump
             my.sprite.player.body.setVelocityY(-jumpForce);
             this.sound.play('jumpSound');  
+
+            // Setting the jumping arc
+            if (cursors.left.isDown) {
+                my.sprite.player.body.setVelocityX(-speed);
+            } else if (cursors.right.isDown) {
+                my.sprite.player.body.setVelocityX(speed);
+            }
 
             // Reset power state
             this.isCrouching = false;
@@ -203,7 +210,7 @@ class Platformer extends Phaser.Scene {
             this.isCrouching = false;
         }
 
-        if (cursors.left.isDown) {
+        if (cursors.left.isDown && my.sprite.player.body.blocked.down) {
             my.sprite.player.setAccelerationX(-speed);
             my.sprite.player.resetFlip();
             my.sprite.player.anims.play('walk', true);
@@ -212,7 +219,7 @@ class Platformer extends Phaser.Scene {
             if (my.sprite.player.body.blocked.down) {
                 my.vfx.walking.start();
             }
-        } else if (cursors.right.isDown) {
+        } else if (cursors.right.isDown && my.sprite.player.body.blocked.down) {
             my.sprite.player.setAccelerationX(speed);
             my.sprite.player.setFlipX(true); 
             my.sprite.player.anims.play('walk', true);
