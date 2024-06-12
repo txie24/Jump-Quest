@@ -68,7 +68,7 @@ class Platformer extends Phaser.Scene {
         this.coinGroup = this.add.group(this.coins);
         this.keyGroup = this.add.group(this.keys);
 
-        my.sprite.player = this.physics.add.sprite(100, 1000, "platformer_characters", "tile_0000.png");
+        my.sprite.player = this.physics.add.sprite(100, 1700, "platformer_characters", "tile_0000.png");
         my.sprite.player.setCollideWorldBounds(true);
 
         this.physics.add.collider(my.sprite.player, this.groundLayer);
