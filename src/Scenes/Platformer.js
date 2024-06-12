@@ -7,6 +7,7 @@ class Platformer extends Phaser.Scene {
         this.MAX_JUMP_VELOCITY = 700; // Maximum jumping force
         this.MAX_CROUCH_TIME = 1000;  // Maximum power-up Time (milliseconds)
         this.jumpDirection = 0; // Direction to jump (0 = no direction, -1 = left, 1 = right)
+        this.savedPosition = null; // Save point position
     }
 
     preload() {
@@ -107,6 +108,8 @@ class Platformer extends Phaser.Scene {
         cursors = this.input.keyboard.createCursorKeys();
         this.rKey = this.input.keyboard.addKey('R');
         this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S); // Save key
+        this.lKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L); // Load key
 
         this.input.keyboard.on('keydown-D', () => {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
@@ -281,6 +284,14 @@ class Platformer extends Phaser.Scene {
             this.scene.restart();
         }
     
+        // Handle saving and loading positions
+        if (Phaser.Input.Keyboard.JustDown(this.sKey)) {
+            this.savePosition();
+        }
+        if (Phaser.Input.Keyboard.JustDown(this.lKey)) {
+            this.loadPosition();
+        }
+
         this.movingPlatforms.forEach(platform => {
             if (platform.container.x >= platform.maxX) {
                 platform.container.body.setVelocityX(-40);
@@ -297,6 +308,20 @@ class Platformer extends Phaser.Scene {
         // Setting the color and position of the progress bar
         this.jumpProgressBar.fillStyle(0x00ff00, 1);  // green
         this.jumpProgressBar.fillRect(my.sprite.player.x - 25, my.sprite.player.y - 40, 50 * progress, 5);  // Progress bar position and size
+    }
+
+    savePosition() {
+        this.savedPosition = { x: my.sprite.player.x, y: my.sprite.player.y };
+        console.log("Position saved:", this.savedPosition);
+    }
+
+    loadPosition() {
+        if (this.savedPosition) {
+            my.sprite.player.setPosition(this.savedPosition.x, this.savedPosition.y);
+            console.log("Position loaded:", this.savedPosition);
+        } else {
+            console.log("No saved position to load.");
+        }
     }
     
     loseLife() {
@@ -315,5 +340,4 @@ class Platformer extends Phaser.Scene {
         this.livesElement.textContent = `Lives: ${this.LIVES}`;
         this.keysElement.textContent = `Keys: ${this.keyCount}`;
     }
-    }
-    
+}
