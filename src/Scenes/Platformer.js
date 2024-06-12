@@ -6,6 +6,7 @@ class Platformer extends Phaser.Scene {
         this.MIN_JUMP_VELOCITY = 200; // minimum jumping force
         this.MAX_JUMP_VELOCITY = 700; // Maximum jumping force
         this.MAX_CROUCH_TIME = 1000;  // Maximum power-up Time (milliseconds)
+        this.jumpDirection = 0; // Direction to jump (0 = no direction, -1 = left, 1 = right)
     }
 
     preload() {
@@ -17,7 +18,7 @@ class Platformer extends Phaser.Scene {
 
     init() {
         this.ACCELERATION = 200;
-        this.DRAG = 500;
+        this.DRAG = 2000;
         this.physics.world.gravity.y = 1500;
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 2.0;
@@ -177,95 +178,101 @@ class Platformer extends Phaser.Scene {
 
     update() {
         let speed = this.ACCELERATION;
-
+    
         if (this.spaceKey.isDown && my.sprite.player.body.blocked.down) {
             speed = this.CROUCH_SPEED;
             my.sprite.player.setScale(1, 0.7);
-
-            // start counting
+    
+            // Start counting
             if (!this.isCrouching) {
                 this.crouchStartTime = this.time.now;
                 this.isCrouching = true;
             }
-
+    
             // Updated power-up progress bar
             let crouchDuration = this.time.now - this.crouchStartTime;
             crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
             let progress = crouchDuration / this.MAX_CROUCH_TIME;
-
+    
             this.updateJumpProgressBar(progress);
+    
+            // Determine the direction to jump
+            if (cursors.left.isDown) {
+                this.jumpDirection = -1; // left
+            } else if (cursors.right.isDown) {
+                this.jumpDirection = 1; // right
+            } else {
+                this.jumpDirection = 0; // no direction
+            }
         } else if (this.spaceKey.isUp && this.isCrouching) {
             my.sprite.player.setScale(1);
-
+    
             // Calculation of power-up time
             let crouchDuration = this.time.now - this.crouchStartTime;
             crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
-
+    
             // Calculating jump force
             let jumpForce = Phaser.Math.Linear(this.MIN_JUMP_VELOCITY, this.MAX_JUMP_VELOCITY, crouchDuration / this.MAX_CROUCH_TIME);
-
+    
             // Jump
             my.sprite.player.body.setVelocityY(-jumpForce);
             this.sound.play('jumpSound');  
-
-            // Setting the jumping arc
-            if (cursors.left.isDown) {
-                my.sprite.player.body.setVelocityX(-speed);
-            } else if (cursors.right.isDown) {
-                my.sprite.player.body.setVelocityX(speed);
+    
+            // Apply the stored jump direction
+            if (this.jumpDirection !== 0) {
+                my.sprite.player.body.setVelocityX(this.jumpDirection * speed);
             }
-
+    
             // Reset power state
             this.isCrouching = false;
-
+    
             // Hide the progress bar
             this.updateJumpProgressBar(0);
         } else if (this.spaceKey.isUp) {
             my.sprite.player.setScale(1);
             this.isCrouching = false;
-
+    
             // Hide the progress bar
             this.updateJumpProgressBar(0);
         }
-
-        if (cursors.left.isDown && my.sprite.player.body.blocked.down) {
-            my.sprite.player.setAccelerationX(-speed);
-            my.sprite.player.resetFlip();
-            my.sprite.player.anims.play('walk', true);
-            my.vfx.walking.startFollow(my.sprite.player, -my.sprite.player.displayWidth / 2 + 10, my.sprite.player.displayHeight / 2 - 5, false);
-            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
-            if (my.sprite.player.body.blocked.down) {
-                my.vfx.walking.start();
-            }
-        } else if (cursors.right.isDown && my.sprite.player.body.blocked.down) {
-            my.sprite.player.setAccelerationX(speed);
-            my.sprite.player.setFlipX(true); 
-            my.sprite.player.anims.play('walk', true);
-            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth / 2 - 10, my.sprite.player.displayHeight / 2 - 5, false);
-            my.vfx.walking.setParticleSpeed(-this.PARTICLE_VELOCITY, 0);
-            if (my.sprite.player.body.blocked.down) {
-                my.vfx.walking.start();
+    
+        if (my.sprite.player.body.blocked.down) {
+            if (this.spaceKey.isDown) {
+                // Prevent sliding when space is held down while on the ground
+                my.sprite.player.setVelocityX(0);
+            } else if (!this.isCrouching) {
+                if (cursors.left.isDown) {
+                    my.sprite.player.setAccelerationX(-speed);
+                    my.sprite.player.setDragX(this.DRAG); // Apply drag to slow down the character when stopping
+                    my.sprite.player.resetFlip();
+                    my.sprite.player.anims.play('walk', true);
+                    my.vfx.walking.startFollow(my.sprite.player, -my.sprite.player.displayWidth / 2 + 10, my.sprite.player.displayHeight / 2 - 5, false);
+                    my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+                    my.vfx.walking.start();
+                } else if (cursors.right.isDown) {
+                    my.sprite.player.setAccelerationX(speed);
+                    my.sprite.player.setDragX(this.DRAG); // Apply drag to slow down the character when stopping
+                    my.sprite.player.setFlipX(true); 
+                    my.sprite.player.anims.play('walk', true);
+                    my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth / 2 - 10, my.sprite.player.displayHeight / 2 - 5, false);
+                    my.vfx.walking.setParticleSpeed(-this.PARTICLE_VELOCITY, 0);
+                    my.vfx.walking.start();
+                } else {
+                    my.sprite.player.setAccelerationX(0);
+                    my.sprite.player.setVelocityX(0);
+                    my.sprite.player.anims.play('idle');
+                    my.vfx.walking.stop();
+                }
             }
         } else {
-            my.sprite.player.setAccelerationX(0);
-            if (my.sprite.player.body.blocked.down) {
-                my.sprite.player.setVelocityX(0);
-                my.sprite.player.anims.play('idle');
-            }
-            my.vfx.walking.stop();
-        }
-
-        if (!my.sprite.player.body.blocked.down) {
             my.sprite.player.setDragX(100);
             my.sprite.player.anims.play('jump');
-        } else {
-            my.sprite.player.setDragX(this.DRAG);
         }
-
+    
         if (Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();
         }
-
+    
         this.movingPlatforms.forEach(platform => {
             if (platform.container.x >= platform.maxX) {
                 platform.container.body.setVelocityX(-40);
@@ -274,14 +281,14 @@ class Platformer extends Phaser.Scene {
             }
         });
     }
-
+    
     updateJumpProgressBar(progress) {
         // Clear the previous progress bar
         this.jumpProgressBar.clear();
 
         // Setting the color and position of the progress bar
         this.jumpProgressBar.fillStyle(0x00ff00, 1);  // green
-        this.jumpProgressBar.fillRect(my.sprite.player.x - 25, my.sprite.player.y - 40, 50 * progress, 5);  // 进度条的位置和大小
+        this.jumpProgressBar.fillRect(my.sprite.player.x - 25, my.sprite.player.y - 40, 50 * progress, 5);  // Progress bar position and size
     }
 
     loseLife() {
