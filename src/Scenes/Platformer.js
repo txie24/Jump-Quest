@@ -230,7 +230,7 @@ class Platformer extends Phaser.Scene {
             container.body.setImmovable(true);
             container.body.allowGravity = false;
             container.body.setVelocityX(50);
-            container.body.setSize(72, 18);
+            container.body.setSize(54, 18);
             this.physics.add.collider(my.sprite.player, container);
 
             this.movingPlatforms2.push({
