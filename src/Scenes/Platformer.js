@@ -1,6 +1,11 @@
 class Platformer extends Phaser.Scene {
     constructor() {
         super("platformerScene");
+        this.crouchStartTime = 0;
+        this.isCrouching = false;
+        this.MIN_JUMP_VELOCITY = 200; // min jump
+        this.MAX_JUMP_VELOCITY = 600; // max jump
+        this.MAX_CROUCH_TIME = 2000;  // max build up
     }
 
     preload() {
@@ -14,7 +19,6 @@ class Platformer extends Phaser.Scene {
         this.ACCELERATION = 200;
         this.DRAG = 1000;
         this.physics.world.gravity.y = 1500;
-        this.JUMP_VELOCITY = -500;
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 2.0;
         this.LIVES = 3;
@@ -172,8 +176,31 @@ class Platformer extends Phaser.Scene {
         if (cursors.down.isDown && my.sprite.player.body.blocked.down) {
             speed = this.CROUCH_SPEED;
             my.sprite.player.setScale(1, 0.7);
+
+            // count
+            if (!this.isCrouching) {
+                this.crouchStartTime = this.time.now;
+                this.isCrouching = true;
+            }
+        } else if (cursors.down.isUp && this.isCrouching) {
+            my.sprite.player.setScale(1);
+
+            // Calculate buildup time
+            let crouchDuration = this.time.now - this.crouchStartTime;
+            crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
+
+            // Calculating jump force
+            let jumpForce = Phaser.Math.Linear(this.MIN_JUMP_VELOCITY, this.MAX_JUMP_VELOCITY, crouchDuration / this.MAX_CROUCH_TIME);
+
+            // jump
+            my.sprite.player.body.setVelocityY(-jumpForce);
+            this.sound.play('jumpSound');  
+
+            // Reset power state
+            this.isCrouching = false;
         } else if (cursors.down.isUp) {
             my.sprite.player.setScale(1);
+            this.isCrouching = false;
         }
 
         if (cursors.left.isDown) {
@@ -208,11 +235,6 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.anims.play('jump');
         } else {
             my.sprite.player.setDragX(this.DRAG);
-        }
-
-        if (my.sprite.player.body.blocked.down && Phaser.Input.Keyboard.JustDown(cursors.up)) {
-            my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
-            this.sound.play('jumpSound');  
         }
 
         if (Phaser.Input.Keyboard.JustDown(this.rKey)) {
