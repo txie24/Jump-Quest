@@ -4,8 +4,8 @@ class Platformer extends Phaser.Scene {
         this.crouchStartTime = 0;
         this.isCrouching = false;
         this.MIN_JUMP_VELOCITY = 200; // min jump
-        this.MAX_JUMP_VELOCITY = 600; // max jump
-        this.MAX_CROUCH_TIME = 2000;  // max build up
+        this.MAX_JUMP_VELOCITY = 700; // max jump
+        this.MAX_CROUCH_TIME = 1000;  // max build up
     }
 
     preload() {
