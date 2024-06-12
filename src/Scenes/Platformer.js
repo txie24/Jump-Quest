@@ -4,7 +4,7 @@ class Platformer extends Phaser.Scene {
         this.crouchStartTime = 0;
         this.isCrouching = false;
         this.MIN_JUMP_VELOCITY = 200; // minimum jumping force
-        this.MAX_JUMP_VELOCITY = 700; // maxmum jumping force
+        this.MAX_JUMP_VELOCITY = 700; // Maximum jumping force
         this.MAX_CROUCH_TIME = 1000;  // Maximum buildup time (milliseconds)
     }
 
@@ -105,6 +105,7 @@ class Platformer extends Phaser.Scene {
 
         cursors = this.input.keyboard.createCursorKeys();
         this.rKey = this.input.keyboard.addKey('R');
+        this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.input.keyboard.on('keydown-D', () => {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
@@ -173,7 +174,7 @@ class Platformer extends Phaser.Scene {
     update() {
         let speed = this.ACCELERATION;
 
-        if (cursors.down.isDown && my.sprite.player.body.blocked.down) {
+        if (this.spaceKey.isDown && my.sprite.player.body.blocked.down) {
             speed = this.CROUCH_SPEED;
             my.sprite.player.setScale(1, 0.7);
 
@@ -182,10 +183,10 @@ class Platformer extends Phaser.Scene {
                 this.crouchStartTime = this.time.now;
                 this.isCrouching = true;
             }
-        } else if (cursors.down.isUp && this.isCrouching) {
+        } else if (this.spaceKey.isUp && this.isCrouching) {
             my.sprite.player.setScale(1);
 
-            // Calculation of storage time
+            // Calculation of bulidup time
             let crouchDuration = this.time.now - this.crouchStartTime;
             crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
 
@@ -205,7 +206,7 @@ class Platformer extends Phaser.Scene {
 
             // Reset power state
             this.isCrouching = false;
-        } else if (cursors.down.isUp) {
+        } else if (this.spaceKey.isUp) {
             my.sprite.player.setScale(1);
             this.isCrouching = false;
         }
