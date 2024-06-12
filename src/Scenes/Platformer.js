@@ -7,6 +7,7 @@ class Platformer extends Phaser.Scene {
         this.MAX_JUMP_VELOCITY = 700; // Maximum jumping force
         this.MAX_CROUCH_TIME = 1000;  // Maximum power-up Time (milliseconds)
         this.jumpDirection = 0; // Direction to jump (0 = no direction, -1 = left, 1 = right)
+        this.savedPosition = null; // Save point position
     }
 
     preload() {
@@ -107,6 +108,8 @@ class Platformer extends Phaser.Scene {
         cursors = this.input.keyboard.createCursorKeys();
         this.rKey = this.input.keyboard.addKey('R');
         this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S); // Save key
+        this.lKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L); // Load key
 
         this.input.keyboard.on('keydown-D', () => {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
@@ -178,24 +181,24 @@ class Platformer extends Phaser.Scene {
 
     update() {
         let speed = this.ACCELERATION;
-    
+
         if (this.spaceKey.isDown && my.sprite.player.body.blocked.down) {
             speed = this.CROUCH_SPEED;
             my.sprite.player.setScale(1, 0.7);
-    
+
             // Start counting
             if (!this.isCrouching) {
                 this.crouchStartTime = this.time.now;
                 this.isCrouching = true;
             }
-    
+
             // Updated power-up progress bar
             let crouchDuration = this.time.now - this.crouchStartTime;
             crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
             let progress = crouchDuration / this.MAX_CROUCH_TIME;
-    
+
             this.updateJumpProgressBar(progress);
-    
+
             // Determine the direction to jump
             if (cursors.left.isDown) {
                 this.jumpDirection = -1; // left
@@ -206,36 +209,36 @@ class Platformer extends Phaser.Scene {
             }
         } else if (this.spaceKey.isUp && this.isCrouching) {
             my.sprite.player.setScale(1);
-    
+
             // Calculation of power-up time
             let crouchDuration = this.time.now - this.crouchStartTime;
             crouchDuration = Phaser.Math.Clamp(crouchDuration, 0, this.MAX_CROUCH_TIME);
-    
+
             // Calculating jump force
             let jumpForce = Phaser.Math.Linear(this.MIN_JUMP_VELOCITY, this.MAX_JUMP_VELOCITY, crouchDuration / this.MAX_CROUCH_TIME);
-    
+
             // Jump
             my.sprite.player.body.setVelocityY(-jumpForce);
             this.sound.play('jumpSound');  
-    
+
             // Apply the stored jump direction
             if (this.jumpDirection !== 0) {
                 my.sprite.player.body.setVelocityX(this.jumpDirection * speed);
             }
-    
+
             // Reset power state
             this.isCrouching = false;
-    
+
             // Hide the progress bar
             this.updateJumpProgressBar(0);
         } else if (this.spaceKey.isUp) {
             my.sprite.player.setScale(1);
             this.isCrouching = false;
-    
+
             // Hide the progress bar
             this.updateJumpProgressBar(0);
         }
-    
+
         if (my.sprite.player.body.blocked.down) {
             if (this.spaceKey.isDown) {
                 // Prevent sliding when space is held down while on the ground
@@ -268,11 +271,19 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.setDragX(100);
             my.sprite.player.anims.play('jump');
         }
-    
+
         if (Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();
         }
-    
+
+        // Handle saving and loading positions
+        if (Phaser.Input.Keyboard.JustDown(this.sKey)) {
+            this.savePosition();
+        }
+        if (Phaser.Input.Keyboard.JustDown(this.lKey)) {
+            this.loadPosition();
+        }
+
         this.movingPlatforms.forEach(platform => {
             if (platform.container.x >= platform.maxX) {
                 platform.container.body.setVelocityX(-40);
@@ -281,7 +292,7 @@ class Platformer extends Phaser.Scene {
             }
         });
     }
-    
+
     updateJumpProgressBar(progress) {
         // Clear the previous progress bar
         this.jumpProgressBar.clear();
@@ -289,6 +300,20 @@ class Platformer extends Phaser.Scene {
         // Setting the color and position of the progress bar
         this.jumpProgressBar.fillStyle(0x00ff00, 1);  // green
         this.jumpProgressBar.fillRect(my.sprite.player.x - 25, my.sprite.player.y - 40, 50 * progress, 5);  // Progress bar position and size
+    }
+
+    savePosition() {
+        this.savedPosition = { x: my.sprite.player.x, y: my.sprite.player.y };
+        console.log("Position saved:", this.savedPosition);
+    }
+
+    loadPosition() {
+        if (this.savedPosition) {
+            my.sprite.player.setPosition(this.savedPosition.x, this.savedPosition.y);
+            console.log("Position loaded:", this.savedPosition);
+        } else {
+            console.log("No saved position to load.");
+        }
     }
 
     loseLife() {
